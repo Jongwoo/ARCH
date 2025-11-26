@@ -24,7 +24,8 @@
 
    - 각 HTTP 요청마다 `X-Request-Id` 헤더를 사용한다.
    - 요청에 헤더가 없으면 서버에서 UUID를 생성한다.
-   - 로그에는 항상 `request_id` 필드를 포함한다.
+   - **모든 로그는 반드시 `request_id`를 포함해야 한다.**
+   - 로깅 시 `extra={"request_id": request_id}` 형식으로 전달한다.
 
 2. **로그 레벨 규칙**
 
@@ -35,8 +36,16 @@
 
 3. **로그 포맷**
 
+   - 로그 포맷에 `request_id`를 포함한다: `[request_id]`
    - 개발 단계에서는 단순 텍스트 포맷
-   - 가능하면 `request_id`, `path`, `method`, `errorCode`(있다면)를 포함
+   - 필수 포함: `request_id`, 선택 포함: `path`, `method`, `errorCode`(있다면)
+   - 예시: `2025-11-26 10:30:45 - [abc-123] - app.service - INFO - Creating task`
+
+4. **로깅 구현 규칙**
+
+   - 모든 API 엔드포인트는 `request_id`를 추출하여 하위 레이어로 전달한다.
+   - 도메인 서비스 메서드는 `request_id` 파라미터를 받아 로깅에 사용한다.
+   - `request_id`가 없는 경우 `-` 또는 `unknown`으로 표시한다.
 
 ## 3. Rationale
 
